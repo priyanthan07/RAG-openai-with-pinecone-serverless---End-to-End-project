@@ -1,0 +1,102 @@
+Pinecone is not a traditional database, but rather a cloud-native vector database specifically designed for similarity search and recommendation systems. It provides a highly efficient and scalable solution for storing and querying high-dimensional vector data.
+
+Introduction:
+
+In similarity search applications, data points are represented as vectors, where each dimension of the vector corresponds to a feature or attribute. Pinecone’s primary goal is to enable fast and accurate similarity searches across vast amounts of vector data.
+
+Pinecone leverages advanced indexing and search algorithms to optimize the performance of similarity search queries. It uses an indexing technique called Approximate Nearest Neighbour (ANN) search, which allows for efficient retrieval of vectors that are similar or closest to a given query vector. By using approximate methods, Pinecone can achieve low-latency search operations even with extremely large datasets.
+
+One of the key advantages of Pinecone is its scalability. It can handle massive amounts of vector data and support real-time updates, making it suitable for high-velocity data streams. It can seamlessly scale horizontally by distributing data and search operations across multiple nodes, ensuring both high throughput and low latency.
+
+Pinecone also provides a user-friendly API that simplifies the integration and usage of the database in applications. It has got the API for all major languages like Python, Javascript, NodeJS etc.
+
+In this article we will see how we can access Pinecone with Python API and expose the operations on pinecone as APIs with the help of FastAPI.
+
+Without any further delay let us start the topic.
+
+Implementation:
+
+The first step in starting this implementation would be creating an account in pinecone and setting a project in pinecone using their console called pinecone console.
+
+
+pinecone console with the project created and org name setup.
+after the project setup, select that project and navigate to the API Keys in the left navigation to get the environment & api key as shown below.
+
+
+console showing the Environment & api key
+Now let us start with the FastAPI + pinecone library to start interacting with pinecone cloud db. let us create a project named pinecone-quickstart place requirements.txt as below.
+
+pinecone-client~=2.2.2
+python-dotenv~=1.0.0
+fastapi~=0.97.0
+uvicorn~=0.22.0
+Let us start creating a class called as PineconeOperations as below.
+
+import pinecone
+import os
+import json
+from dotenv import load_dotenv, find_dotenv
+
+
+Now let us create a fastapi routes to access the operations of pinecone created above. create a file called main.py and keep the below routes in that file.
+
+from fastapi import FastAPI
+from typing import List, Tuple, Any
+from pydantic.main import BaseModel
+from pineconecore.pineconeops import PineconeOperations
+
+app = FastAPI()
+pineconeOps = PineconeOperations()
+
+
+class Data(BaseModel):
+    payload: List[Tuple[Any, Any]]
+
+
+@app.get("/api/v1/health")
+async def root():
+    return {"message": "OK"}
+
+
+@app.post("/api/v1/index")
+async def create_index(name: str):
+    return pineconeOps.create_index(index_name=name)
+
+
+@app.get("/api/v1/index/stats")
+async def stats():
+    return pineconeOps.fetch_stats()
+
+
+@app.get("/api/v1/connect")
+async def create_index():
+    return pineconeOps.connect_index()
+
+
+@app.post("/api/v1/vectors")
+async def create_index(data: Data):
+    return pineconeOps.upsert(data=data.payload)
+
+
+@app.post("/api/v1/search-vector")
+async def create_index(payload: List[Any]):
+    return pineconeOps.query(query_vector=payload)
+
+navigate to the location where main.py is present and run the below command.
+
+uvicorn main:app --reload
+if everything goes well then you should see the below log in the console of your terminal window.
+
+
+terminal showing the application run status
+once the application is running, launch the browser and hit the below FastAPI — Swagger UI.
+
+
+FastAPI swagger ui with operations.
+Now we are ready to do some operations on pinecone by using our swagger and once you save some data to database and go to pinecone console and navigate to indexes menu in left navigation this is how it should look like. in my case i create 9 vectors some with namespace and some without namespace.
+
+
+pinecone console showing the vectors that got created
+Conclusion:
+
+In summary, using a Pinecone vector database offers several advantages. It enables efficient and accurate retrieval of similar vectors, making it suitable for recommendation systems, anomaly detection, and search engines. Pinecone can handle large-scale datasets, ensuring real-time search capabilities even with massive data volumes. Its flexibility in handling diverse vector types allows businesses to leverage various data formats. Pinecone provides a developer-friendly experience with an easy-to-use API and integration options. With Pinecone, businesses can unlock the potential of their data, extract valuable insights, and deliver personalized user experiences.

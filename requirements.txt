@@ -1,0 +1,7 @@
+pinecone
+openai
+langchain
+python-dotenv
+sentence-transformers
+fastapi
+streamlit
