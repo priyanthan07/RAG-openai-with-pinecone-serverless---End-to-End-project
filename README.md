@@ -1,0 +1,1 @@
+# RAG-openai-with-pinecone-serverless---End-to-End-project
